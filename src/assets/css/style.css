@@ -1,0 +1,247 @@
+html, body{
+	width: 100%;
+	height: 100%;
+}
+
+body{
+	margin: 0;
+	background: radial-gradient(#E0F7FA, #00BCD4);
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#container{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: calc(100% - 200px);
+	height: calc(100% - 200px);
+	background: rgb(255, 255, 255);
+	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+	display: flex;
+	flex-direction: column;
+}
+
+@media (max-width: 1000px){
+	#container{
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.row{
+	display: flex;
+	width: 100%;
+	height: 100%;
+	flex-direction: row;
+}
+
+.row .column{
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.row .column.hide{
+	display: none;
+	min-width: 0;
+	width: 0;
+	overflow: hidden;
+}
+
+.row .column[data-title]::after{
+	content: attr(data-title);
+	display: block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 5px;
+	color: rgba(0, 0, 0, 0.6);
+	pointer-events: none;
+	background-color: rgb(240, 240, 240);
+}
+
+.row:not(.toolbar) > .column:not(:last-of-type){
+	border-right: 1px solid rgba(230, 230, 230, 0.6);
+}
+
+.row:not(.toolbar):not(:last-of-type){
+	border-bottom: 1px solid rgba(230, 230, 230, 0.6);
+}
+
+.row.toolbar{
+	min-height: 38px;
+	height: 38px;
+	background-color: #546E7A;
+	line-height: 38px;
+	color: rgb(255, 255, 255);
+}
+
+.row.toolbar.secondary{
+	background-color: #768b94;
+}
+
+.row.toolbar .column{
+	padding: 0 9px;
+	font-weight: 200;
+}
+
+.row.toolbar .column.actions{
+	width: auto;
+	display: flex;
+	padding: 0;
+}
+
+.row.toolbar .column.actions .action{
+	margin: 0;
+	display: block;
+	width: 38px;
+	height: 38px;
+	text-align: center;
+	cursor: pointer;
+	position: relative;
+}
+
+.row.toolbar .column.actions .seperator{
+	width: 1px;
+	height: 38px;
+	background: rgba(0, 0, 0, 0.1);
+}
+
+.row.toolbar .column.actions .action.is-active,
+.row.toolbar .column.actions .action:not(.toggle):hover{
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+h1, h2, h3, h4, h5, h6{
+	margin: 0;
+	font-weight: 300;
+	border-bottom: 1px solid rgba(230, 230, 230, 0.6);
+}
+
+.warning{
+	padding: 6px;
+	text-align: center;
+	color: rgba(0, 0, 0, 0.6);
+	font-size: 16px;
+	box-sizing: border-box;
+}
+
+.warning.center{
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+textarea.seamless{
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font: inherit;
+	border: none;
+	outline: none;
+	resize: none;
+}
+
+.error{
+	background: rgba(255, 40, 40, 0.8);
+	color: rgba(255, 255, 255, 0.8);
+	padding: 10px;
+}
+
+.error.hide{
+	display: none;
+}
+
+#files{
+	background: rgba(236, 239, 241, 1);
+	max-width: 300px;
+	font-size: 14px;
+}
+
+#files .group{
+	display: block;
+}
+
+#files .group .header{
+	display: block;
+	width: 100%;
+	font-size: 18px;
+	font-weight: 200;
+	padding: 12px 0;
+	color: #546E7A;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+#files .group .header::before{
+	padding: 0 16px;
+	width: 16px;
+	text-align: center;
+	display: inline-block;
+	content: '\f105';
+	font-family: 'FontAwesome';
+	transform: rotate(90deg);
+	transition: transform 300ms;
+}
+
+#files .group .body{
+	opacity: 1;
+	transition: opacity 300ms;
+}
+
+#files .group .body a{
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	font-size: 15px;
+	font-weight: 300;
+	padding: 6px 48px;
+	height: 20px;
+	line-height: 20px;
+	transition: height 300ms, padding-top 300ms, padding-bottom 300ms;
+	overflow: hidden;
+}
+
+#files .group .body a:hover{
+	background-color: rgba(230, 230, 230, 0.8);
+}
+
+#files .group input[type=checkbox]{
+	display: none;
+}
+
+#files .group input[type=checkbox]:checked ~ .body{
+	opacity: 0;
+}
+
+#files .group input[type=checkbox]:checked ~ .body a{
+	height: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+#files .group input[type=checkbox]:checked ~ .header::before{
+	transform: rotate(0deg);
+}
+
+#editor textarea {
+	padding: 9px;
+}
+
+.markdown{
+	min-width: 300px;
+	overflow: auto;
+	padding: 9px;
+	word-wrap: break-word;
+}
+
+.markdown code,
+.markdown pre{
+	white-space: pre-wrap;
+}

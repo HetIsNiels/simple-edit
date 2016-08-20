@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Simple Edit</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+	<link rel="stylesheet" href="assets/css/style.css" />
+	<link rel="stylesheet" href="assets/lib/font-awesome/css/font-awesome.css" />
+
+	<script src="assets/lib/markdown-it/markdown-it.js"></script>
+	<script src="assets/lib/markdown-it-emoji/markdown-it-emoji.js"></script>
+	<script src="assets/lib/jquery/jquery-3.1.0.js"></script>
+	<script src="assets/js/simple-edit.js"></script>
+</head>
+<body>
+	<div id="container">
+		<div class="row toolbar">
+			<div class="column">Simple Edit</div>
+			<div class="column actions">
+				<a class="action" data-action="pdf"><i class="fa fa-file-pdf-o"></i></a>
+				<!--<a class="action"><i class="fa fa-download"></i></a>-->
+				<!--<a class="action"><i class="fa fa-upload"></i></a>-->
+
+				<div class="seperator"></div>
+
+				<a class="action toggle" data-toggle="files"><i class="fa fa-file-o"></i></a>
+				<!--<a class="action toggle" data-toggle="editor"><i class="fa fa-font"></i></a>-->
+				<a class="action toggle" data-toggle="preview"><i class="fa fa-eye"></i></a>
+				<a class="action toggle is-active" data-toggle="cheatsheet"><i class="fa fa-question"></i></a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="column" id="files" data-column="files">
+				<div class="row toolbar secondary">
+					<div class="column">Files</div>
+					<div class="column actions">
+						<a class="action"><i class="fa fa-plus"></i></a>
+					</div>
+				</div>
+				<div id="file-tree"></div>
+			</div>
+			<div class="column" data-title="Editor" id="editor" data-column="editor">
+				<textarea class="seamless" autofocus></textarea>
+			</div>
+			<div class="column markdown" data-title="Preview" id="preview" data-column="preview"></div>
+			<div class="column markdown hide" data-title="Cheatsheet" id="cheatsheet" data-column="cheatsheet"></div>
+		</div>
+	</div>
+</body>
+</html>
