@@ -1,11 +1,15 @@
 'use strict';
 
 class JsonSerializable{
+	constructor() {
+		this._identifier = SimpleEdit.identifier;
+	}
+
 	toJson(){
 		let data = {};
 
 		for(let key in this)
-			if(this.hasOwnProperty(key))
+			if(this.hasOwnProperty(key) && key !== '_identifier')
 				data[key] = this[key];
 
 		return JSON.stringify(data);
@@ -15,7 +19,7 @@ class JsonSerializable{
 		data = JSON.parse(data);
 
 		for(let key in data)
-			if(data.hasOwnProperty(key))
+			if(data.hasOwnProperty(key) && key !== '_identifier')
 				this[key] = data[key];	
 
 		return this;
@@ -43,61 +47,89 @@ class SimpleEdit {
 		this.updateCheatSheet();
 	}
 
-	_addEventListeners() {
-		$(document).on('click', '[data-toggle]', function () {
-			let column = $(`[data-column="${$(this).attr('data-toggle')}"]`);
-			let toggle = $(`[data-toggle="${$(this).attr('data-toggle')}"]`);
+	static get identifier() {
+		if (!SimpleEdit._identifier)
+			SimpleEdit._identifier = 100000;
+		
+		return SimpleEdit._identifier++;
+	}
 
-			if (column.hasClass('hide')) {
-				column.removeClass('hide');
-				toggle.removeClass('is-active');
-			} else {
-				column.addClass('hide');
-				toggle.addClass('is-active');
-			}
-		});
+	_action(action, data){
+		switch(action){
+			case 'toggle-column':
+				let column = $(`.column[data-column="${data.column}"]`);
+				let toggle = $(`[data-action="toggle-column"][data-column="${data.column}"]`);
 
-		/*$(document).on('click', '[data-action]', function () {
-			let token = window.localStorage.getItem('x-token') || null;
+				if (column.hasClass('hide')) {
+					column.removeClass('hide');
+					toggle.removeClass('is-active');
+				} else {
+					column.addClass('hide');
+					toggle.addClass('is-active');
+				}
 
-			if (token === null)
-				token = prompt('X-Token');
-			
-			window.localStorage.setItem('x-token', token);
+				break;
 
-			var headers = new Headers();
-			headers.append('X-Token', token);
-			headers.append('X-Type', 'markdown');
+			case 'group-create':
+				this.createGroup().edit();
+				break;
 
-			fetch('https://api.paperbark.io/pdf', {
-				method: 'POST',
-				headers: headers,
-				body: $('#editor textarea').val()
-			}).then(function (response) {
-				if (!response.ok)
-					throw new Error('document failed to load');
+			case 'pdf':
+				// Rewrite this
+				if(!confirm('Generate PDF?'))
+					return;
+
+				let token = window.localStorage.getItem('x-token') || null;
+
+				if (token === null)
+					token = prompt('X-Token');
 				
-				return response.blob();
-			}).then(function (blob) {
-					return URL.createObjectURL(blob);
-			}).then(function (url) {
-				let a = document.createElement('a');
-				a.href = url;
-				a.download = 'download.pdf';
-				a.click();
-			}).catch(function () {
-				simpleEdit.error('Error while genrating PDF.');
-			});
-		});*/
+				window.localStorage.setItem('x-token', token);
+
+				var headers = new Headers();
+				headers.append('X-Token', token);
+				headers.append('X-Type', 'markdown');
+
+				fetch('https://api.paperbark.io/pdf', {
+					method: 'POST',
+					headers: headers,
+					body: $('#editor textarea').val()
+				}).then(function (response) {
+					if (!response.ok)
+						throw new Error('document failed to load');
+					
+					return response.blob();
+				}).then(function (blob) {
+						return URL.createObjectURL(blob);
+				}).then(function (url) {
+					let a = document.createElement('a');
+					a.href = url;
+					a.download = 'download.pdf';
+					a.click();
+				}).catch(function () {
+					simpleEdit.error('Error while genrating PDF.');
+				});
+
+				break;
+
+			default:
+				console.log('Unknown action ' + action, data);
+		}
+	}
+
+	_addEventListeners() {
+		var simpleEdit = this;
+		$(document).on('click', '[data-action]', function(){
+			let action = $(this).attr('data-action');
+			let data = $(this).get(0).dataset;
+
+			simpleEdit._action(action, data);
+		});
 
 		$(document).on('change keyup', '#editor textarea', () => this.updatePreview());
 		$(window).on('unload', () => this.save());
 	}
-
-	toggleColumn(column) {
-		alert(column);
-	}
-
+	
 	load() {
 		// Load groups & files
 		let groups = JSON.parse(window.localStorage.getItem('groups')) || [];
@@ -106,8 +138,8 @@ class SimpleEdit {
 		// Load columns
 		let columns = JSON.parse(window.localStorage.getItem('columns')) || [];
 		columns.forEach((column) => {
-			let element = $(`[data-column="${column.column}"]`);
-			let toggle = $(`[data-toggle="${column.column}"]`);
+			let element = $(`.column[data-column="${column.column}"]`);
+			let toggle = $(`[data-action="toggle-column"][data-column="${column.column}"]`);
 
 			if (column.hidden) {
 				element.addClass('hide');
@@ -137,7 +169,11 @@ class SimpleEdit {
 	}
 
 	createGroup(name, files){
-		return this.groups.push(new SimpleEditGroup(name, files)) - 1;
+		let group = new SimpleEditGroup(name, files);
+		this.groups.push(group);
+		this.updateFileTree();
+
+		return group;
 	}
 
 	error(msg){
@@ -169,14 +205,16 @@ class SimpleEdit {
 					body = '<a>No files yet</a>';
 				} else {
 					group.files.forEach((file, index) => {
-						body += `<a href="#">${file.name}</a>`;
+						body += `<a href="#" id="file-${file._identifier}">${file.name}</a>`;
 					});
 				}
 
 				html +=
-					`<div class="group" id="group-${id}">
-						<input type="checkbox" id="group-toggle-${id}" />
-						<label for="group-toggle-${id}" class="header">${group.name}</label>
+					`<div class="group" id="group-${group._identifier}">
+						<input type="checkbox" id="group-toggle-${group._identifier}" />
+						<label for="group-toggle-${group._identifier}" class="header">
+							${group.name}
+						</label>
 						<div class="body">
 							${body}
 						</div>
@@ -188,13 +226,13 @@ class SimpleEdit {
 	}
 
 	updateCheatSheet() {
-		$.get('https://raw.githubusercontent.com/wiki/adam-p/markdown-here/Markdown-Cheatsheet.md', (markdown) => {
+		$.get('assets/cheatsheet.md', (markdown) => {
 			$('#cheatsheet').html(this.markdownIt.render(markdown));
 		})
 	}
 }
 
-class SimpleEditGroup extends JsonSerializable{
+class SimpleEditGroup extends JsonSerializable {
 	constructor(name, files){
 		super();
 
@@ -214,28 +252,17 @@ class SimpleEditGroup extends JsonSerializable{
 		return this._files;
 	}
 
-	_update() {
-		
-	}
-
-	fromJson(data) {
-		super.fromJson(data);
-
-		this._update();
-
-		return this;
-	}
-
 	createFile(){
 		return this.files.push(new SimpleEditFile()) - 1;
 	}
 }
 
-class SimpleEditFile extends JsonSerializable{
-	constructor(name){
+class SimpleEditFile extends JsonSerializable {
+	constructor(name, content){
 		super();
 		
 		this._name = name || 'New file';
+		this._content = content || '';
 	}
 
 	get name(){
@@ -244,6 +271,14 @@ class SimpleEditFile extends JsonSerializable{
 
 	set name(value){
 		this._name = value;
+	}
+
+	get content(){
+		return this._content;
+	}
+
+	set content(value){
+		this._content = value;
 	}
 }
 

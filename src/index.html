@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html manifest="index.manifest">
 <head>
 	<title>Simple Edit</title>
 	
@@ -24,10 +24,10 @@
 
 				<div class="seperator"></div>
 
-				<a class="action toggle" data-toggle="files"><i class="fa fa-file-o"></i></a>
-				<!--<a class="action toggle" data-toggle="editor"><i class="fa fa-font"></i></a>-->
-				<a class="action toggle" data-toggle="preview"><i class="fa fa-eye"></i></a>
-				<a class="action toggle is-active" data-toggle="cheatsheet"><i class="fa fa-question"></i></a>
+				<a class="action toggle" data-action="toggle-column" data-column="files"><i class="fa fa-file-o"></i></a>
+				<!--<a class="action toggle" data-action="toggle-column" data-column="editor"><i class="fa fa-font"></i></a>-->
+				<a class="action toggle" data-action="toggle-column" data-column="preview"><i class="fa fa-eye"></i></a>
+				<a class="action toggle is-active" data-action="toggle-column" data-column="cheatsheet"><i class="fa fa-question"></i></a>
 			</div>
 		</div>
 		<div class="row">
@@ -35,7 +35,7 @@
 				<div class="row toolbar secondary">
 					<div class="column">Files</div>
 					<div class="column actions">
-						<a class="action"><i class="fa fa-plus"></i></a>
+						<a class="action" data-action="group-create"><i class="fa fa-plus"></i></a>
 					</div>
 				</div>
 				<div id="file-tree"></div>

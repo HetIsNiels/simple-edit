@@ -162,6 +162,13 @@ textarea.seamless{
 	background: rgba(236, 239, 241, 1);
 	max-width: 300px;
 	font-size: 14px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+#file-tree{
+	overflow: auto;
 }
 
 #files .group{
